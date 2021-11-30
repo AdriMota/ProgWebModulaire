@@ -1,4 +1,8 @@
-import Circle from "../Classes/Circle.js";
+import Circle from "../class/Circles/InFlatTorus.js";
+import * as random from "../lib/randomInt.mjs";
+import randomColor from "../lib/randomColor.mjs";
+import MainLoop from "../lib/mainloop.js";
+import Keyboard from "../class/Keyboard.js";
 
 const ctx = document.querySelector('canvas').getContext('2d');
 
@@ -6,21 +10,57 @@ const ctx = document.querySelector('canvas').getContext('2d');
 ctx.canvas.height = ctx.canvas.clientHeight;
 ctx.canvas.width = ctx.canvas.clientWidth;
 
-const c1 = new Circle({y: 200, x: 100, color: '#11aa77'});
+const keyboard = new Keyboard();
 
-let lastTime = 0;
-// Un tick = ce qui se produit à chaque frame
-function tick(time) {
-    let deltaT = time - lastTime;
-    lastTime = time;
+// Stockage des cercles
+const tabCercles = [];
 
-    ctx.canvas.height = ctx.canvas.clientHeight;
-    ctx.canvas.width = ctx.canvas.clientWidth;
+// Générer 300 cercles aléatoires
+for (let i = 0; i < 300; i++) {
+    const x = random.getInt(0, ctx.canvas.width);
+    const y = random.getInt(0, ctx.canvas.height);
+    const r = random.getIntMini(5, 40);
+    const speed = r / 400;
+    const direction = Math.PI/2;
+    const color = randomColor();
+    const width = ctx.canvas.width;
+    const height = ctx.canvas.height;
 
-    c1.setX(c1.x + 0.1 * deltaT);
-    c1.draw(ctx);
+    const cercle = new Circle({ x, y, r, speed, direction, color, width, height });
+    tabCercles.push(cercle);
 
-    requestAnimationFrame(tick);
 }
 
-requestAnimationFrame(tick);
+tabCercles.sort((c1, c2) => c1.compareTo(c2));
+
+MainLoop.setUpdate(dt => {
+    for (const cercle of tabCercles) {
+        if (keyboard.isKeyDown('KeyA')) {
+            cercle.move(dt, (Math.PI));
+        };
+        
+        if (keyboard.isKeyDown('KeyD')) {
+            cercle.move(dt, 0);
+        };
+
+        if (keyboard.isKeyDown('KeyW')) {
+            cercle.move(dt, (Math.PI * 1.5));
+        };
+
+        if (keyboard.isKeyDown('KeyS')) {
+            cercle.move(dt, (Math.PI * 0.5));
+        };
+
+        //cercle.move(dt, ctx.canvas.width, ctx.canvas.height);
+    }
+});
+
+MainLoop.setDraw(() => {
+    ctx.canvas.height = ctx.canvas.clientHeight;
+    ctx.canvas.width = ctx.canvas.clientWidth;
+    for (const cercle of tabCercles) {
+        cercle.draw(ctx);
+    }
+});
+
+MainLoop.start();
