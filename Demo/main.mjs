@@ -3,6 +3,7 @@ import * as random from "../lib/randomInt.mjs";
 import randomColor from "../lib/randomColor.mjs";
 import MainLoop from "../lib/mainloop.js";
 import Keyboard from "../class/Keyboard.js";
+import { generate } from "../lib/matrix.js";
 
 const ctx = document.querySelector('canvas').getContext('2d');
 
