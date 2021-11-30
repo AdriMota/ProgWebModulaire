@@ -27,6 +27,14 @@ export default class Circle {
         this.speed = speed;
     }
 
+    setHeight(height) {
+        this.height = height;
+    }
+
+    setWidth(width) {
+        this.width = width;
+    }
+
     setColor(color) {
         this.color = color;
     }

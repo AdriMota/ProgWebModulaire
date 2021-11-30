@@ -59,7 +59,10 @@ MainLoop.setUpdate(dt => {
 MainLoop.setDraw(() => {
     ctx.canvas.height = ctx.canvas.clientHeight;
     ctx.canvas.width = ctx.canvas.clientWidth;
+
     for (const cercle of tabCercles) {
+        cercle.setHeight(ctx.canvas.height);
+        cercle.setWidth(ctx.canvas.width);
         cercle.draw(ctx);
     }
 });
