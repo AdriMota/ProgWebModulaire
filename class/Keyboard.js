@@ -1,18 +1,21 @@
 export default class Keyboard {
-    constructor() {
-        this.keys = new Set();
-
+    constructor(useCode = true) {
         window.addEventListener('keydown', evt => this.#onKeyDown(evt));
         window.addEventListener('keyup', evt => this.#onKeyUp(evt));
+        
+        this.keysPressed = new Set();
         this.actionsOnKeyPressed = new Map();
+
+        this.codeOrKey = useCode ? 'code' : 'key';
     }
 
     // # -> méthode privée
     #onKeyDown(evt) {
-        this.keys.add(evt.code);
-        
-        if (this.actionsOnKeyPressed.has(evt.code)) {
-            let callbacks = this.actionsOnKeyPressed.get(evt.code);
+        const key = evt[this.codeOrKey];
+        this.keysPressed.add(key);
+
+        if (this.actionsOnKeyPressed.has(key)) {
+            let callbacks = this.actionsOnKeyPressed.get(key);
             callbacks.forEach(callback => callback());
         }
     }
@@ -26,15 +29,23 @@ export default class Keyboard {
             actions = [];
         }
 
-        this.actionsOnKeyPressed.set(key, callback);
+        actions.push(callback);
+
+        this.actionsOnKeyPressed.set(key, actions);
     }
 
     // # -> méthode privée
     #onKeyUp(evt) {
-        this.keys.delete(evt.code);
+        const key = evt[this.codeOrKey];
+        this.keysPressed.delete(key);
     }
 
     isKeyDown(key) {
-        return this.keys.has(key);
+        return this.keysPressed.has(key);
     }
+
+    isKeysDown(...keys) {
+        return keys.every(key => this.isKeyDown(key));
+    }    
+      
 }

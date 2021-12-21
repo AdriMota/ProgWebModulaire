@@ -2,7 +2,7 @@ import { generate, clone } from "../lib/matrix.js";
 
 // "default" permet de renommer la classe lorsqu'elle sera importée
 export default class Automaton {
-    constructor({ rows = 10, cols = 10, cellSize = 14, colorAlive = 'pink', colorDead = "black", birth, survival } = {}) {
+    constructor({ rows = 10, cols = 10, cellSize = 14, prob = 0.5, colorAlive = 'pink', colorDead = "black", birth, survival } = {}) {
         this.rows = rows;
         this.cols = cols;
         this.cellSize = cellSize;
@@ -10,7 +10,7 @@ export default class Automaton {
         this.colorDead = colorDead;
         this.birth = birth;
         this.survival = survival;
-        this.matrix = generate(this.rows, this.cols);
+        this.randomize(prob);
     }
 
 
@@ -46,21 +46,21 @@ export default class Automaton {
 
 
     // Retournera le nombre de cellules vivantes dans le voisinage de Moore d'une cellule.
-    livingCellsNeighbor({ x, y }) {
+    livingCellsNeighbor({ row, col }) {
         let counter = 0;
 
         // vérifie si le x des cellules voisines n'est pas hors de l'écran (hors du tableau)
-        let rowEnd = x + 1;
-        if (rowEnd >= this.rows) rowEnd = x;
+        let rowEnd = row + 1;
+        if (rowEnd >= this.rows) rowEnd = row;
 
-        let rowStart = x - 1;
+        let rowStart = row - 1;
         if (rowStart < 0) rowStart = 0;
 
         // vérifie si le y des cellules voisines n'est pas hors de l'écran (hors du tableau)
-        let colEnd = y + 1;
-        if (colEnd >= this.cols) colEnd = y;
+        let colEnd = col + 1;
+        if (colEnd >= this.cols) colEnd = col;
 
-        let colStart = y - 1;
+        let colStart = col - 1;
         if (colStart < 0) colStart = 0;
 
 
@@ -76,7 +76,7 @@ export default class Automaton {
             }
         }
 
-        if (this.matrix[x][y]) counter--;
+        if (this.matrix[row][col]) counter--;
 
         return counter;
     }
@@ -90,8 +90,8 @@ export default class Automaton {
         // Calculer le nombre de cellules vivantes dans le voisinage de Moore de la cellule [x][y].
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.cols; col++) {
-                const counter = this.livingCellsNeighbor({ x: row, y: col });
-
+                const counter = this.livingCellsNeighbor({ row, col });
+                
                 // Si la cellule est morte et respecte les règles des 3 voisins
                 if (this.matrix[row][col] == 0 && this.birth.has(counter)) {
                     // Naîssance de la cellule
