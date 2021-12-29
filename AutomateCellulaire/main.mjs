@@ -23,8 +23,24 @@ const cols = Math.round(ctx.canvas.width / cellSize);
 let pause = false;
 let freq = 30;
 let prob = 0.5;
+let gen = 0;
 
 let automaton = new Automaton({ rows, cols, cellSize, prob, birth, survival });
+
+
+// Change rules color
+birth.forEach(val => {
+
+    const bNode = document.querySelector(`[data-rule-type="b"][data-rule-num="${val}"]`);
+    bNode.classList.add('apply');
+
+});
+survival.forEach(val => {
+
+    const bNode = document.querySelector(`[data-rule-type="s"][data-rule-num="${val}"]`);
+    bNode.classList.add('apply');
+
+});
 
 
 keyboard.onKeyDown('p', () => {
@@ -43,6 +59,7 @@ keyboard.onKeyDown('w', () => {
 
 keyboard.onKeyDown('r', () => {
     automaton = new Automaton({ rows, cols, cellSize, prob, birth, survival });
+    gen = 0;
 });
 
 keyboard.onKeyDown('a', () => {
@@ -72,12 +89,22 @@ domOn('.rule', 'click', evt => {
 
     // Si la règle est déjà appliquée, on la supprime, sinon on l'applique
     rule.has(ruleNum) ? rule.delete(ruleNum) : rule.add(ruleNum);
+    rule.has(ruleNum) ? dom.classList.add('apply') : dom.classList.remove('apply');
 })
 
 
 MainLoop.setUpdate(() => {
     if (pause) return;
     automaton.changeCellState();
+    gen++;
+
+    // Gestion du DOM
+    document.querySelector('#freq').textContent = freq;
+    document.querySelector('#map').textContent = document.querySelector('#map').dataset.flatTorus;
+    document.querySelector('#tile-size').textContent = cellSize;
+    document.querySelector('#generation').textContent = gen;
+    document.querySelector('#alive-prob').textContent = Math.round(prob * 100);
+    document.querySelector('#fps').textContent = Math.round(MainLoop.getFPS());
 })
 
 MainLoop.setDraw(() => {
