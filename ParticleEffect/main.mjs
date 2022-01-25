@@ -13,7 +13,7 @@ ctx.canvas.width = ctx.canvas.clientWidth;
 const sprites = new Array(300);
 const imgHeight = 64;
 const imgWidth = 64;
-let mouse = { x: -100, y: -100, height: 200, width: 200 };
+let mouse = { x: -100, y: -100, height: 150, width: 150 };
 
 for (let i = 0; i < sprites.length; i++) {
 
@@ -49,30 +49,21 @@ domOn('canvas', 'mousemove', event => {
 
     mouse.x = event.clientX - rect.left;
     mouse.y = event.clientY - rect.top;
-
-    sprites.forEach(sprite => {
-        let collision = sprite.x < mouse.x + mouse.width &&
-            sprite.x + sprite.width > mouse.x &&
-            sprite.y < mouse.y + mouse.height &&
-            sprite.height + sprite.y > mouse.y
-            ? true
-            : false;
-
-        if (collision) {
-            const velX = Math.atan2(sprite.x - mouse.x, sprite.y - mouse.y) / 6;
-
-            sprite.setVelX(velX);
-        }
-    })
 })
 
 MainLoop.setUpdate(dt => {
     tweens.update(dt, ctx.canvas.width, ctx.canvas.height);
 
-    for (const sprite of sprites) {
+    sprites.forEach(sprite => {
         sprite.move(dt);
         sprite.bounceOffTheWalls(ctx);
-    }
+
+        if (sprite.isInHitbox(mouse.x, mouse.y, mouse.width, mouse.height)) {
+            const angle = sprite.getAngle(mouse.x, mouse.y);
+            sprite.setVelFromAngle(angle);
+        }
+
+    })
 
 });
 
